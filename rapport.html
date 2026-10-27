@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rapport journalier – TransMedics &amp; Take-Two (GTA VI)</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f4f5f7;--card:#fff;--tx:#14171c;--mut:#6b7280;--bd:#e1e4e8;--ac:#2563eb;--ok:#15803d;--ko:#b91c1c;--warn:#b45309;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1116;--card:#171b22;--tx:#e8eaed;--mut:#9aa3af;--bd:#2a303a;--ac:#60a5fa;--ok:#4ade80;--ko:#f87171;--warn:#fbbf24;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e1116;--card:#171b22;--tx:#e8eaed;--mut:#9aa3af;--bd:#2a303a;--ac:#60a5fa;--ok:#4ade80;--ko:#f87171;--warn:#fbbf24;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:1300px;margin:0 auto;padding:16px}
+h1{font-size:22px;margin:0}
+h2{font-size:19px;margin:0}
+h3{font-size:13px;margin:14px 0 4px;text-transform:uppercase;letter-spacing:.04em;color:var(--mut)}
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.date{color:var(--mut);font-size:13px}
+.cds{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:14px}
+.cd{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px 12px}
+.cd small{color:var(--mut);display:block}
+.cd b{font-size:22px;font-variant-numeric:tabular-nums}
+.cd span{font-size:12px;color:var(--mut)}
+.seg{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.seg button,.tf button{font:inherit;padding:7px 12px;border-radius:8px;border:1px solid var(--bd);background:var(--card);color:var(--tx);cursor:pointer}
+.seg button.on,.tf button.on{background:var(--ac);border-color:var(--ac);color:#fff;font-weight:600}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+.cols.one{grid-template-columns:1fr}
+@media(max-width:980px){.cols{grid-template-columns:1fr}}
+.asset{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;min-width:0}
+.asset .sub{color:var(--mut);font-size:13px;margin:2px 0 10px}
+.tf{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
+.tf button{padding:4px 9px;font-size:13px}
+.chart{height:460px;border-radius:8px;overflow:hidden;border:1px solid var(--bd)}
+.news{height:480px;border-radius:8px;overflow:hidden;border:1px solid var(--bd)}
+ul{margin:0;padding-left:20px}
+li{margin:3px 0}
+.pos li::marker{color:var(--ok)}.neg li::marker{color:var(--ko)}.dt li::marker{color:var(--warn)}
+.src{font-size:12px;color:var(--mut);margin-top:10px}
+.src a,.foot a{color:var(--ac)}
+.foot{color:var(--mut);font-size:12px;margin-top:20px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div><h1>📊 Rapport journalier</h1><div class="date" id="date"></div></div>
+  </div>
+
+  <div class="cds" id="cds"></div>
+
+  <div class="seg" id="view">
+    <button data-v="all" class="on">Les deux</button>
+    <button data-v="TMDX">TransMedics (TMDX)</button>
+    <button data-v="TTWO">Take-Two / GTA (TTWO)</button>
+  </div>
+
+  <div class="cols" id="cols"></div>
+
+  <div class="foot">
+    Ceci n’est ni un conseil financier ni une recommandation d’achat ou de vente. Le résumé écrit est rédigé à la date indiquée à partir de sources publiques citées ; les graphiques et les flux d’actualités sont fournis en direct par TradingView. Pour mettre le résumé à jour, modifie l’objet <code>REPORT</code> en haut du script.
+  </div>
+</div>
+
+<script>
+// ───────── RÉSUMÉ ÉCRIT (à modifier chaque jour) ─────────
+const REPORT = {
+  date: "27 octobre 2026",
+  TMDX: {
+    sym: "NASDAQ:TMDX", name: "TransMedics (TMDX)",
+    sub: "Préservation et transport d’organes (système OCS) avec sa propre flotte d’avions",
+    pos: [
+      "Résultats du T2 2026 : chiffre d’affaires de 189,9 M$ (+21 %), marge brute de 60 %. Ses avions ont couvert 86 % des dons du programme national OCS.",
+      "Prévision 2026 de chiffre d’affaires maintenue entre 737 et 757 M$ (réitérée le 10/09), avec un nouveau directeur financier, Fernando Araujo, en poste depuis le 21/09."
+    ],
+    neg: [
+      "L’action recule d’environ 42 % depuis le début de l’année ; elle valait environ 72 $ le 16/10 (−5,7 % ce jour-là).",
+      "Le résultat d’exploitation du T2 baisse à 23,7 M$ contre 36,6 M$ un an plus tôt : la société investit (OCS rein, nouvelle génération, international) et la marge se tasse. Le titre avait perdu environ 8 % à la publication, et plus de 20 % après le T1.",
+      "Avis des analystes : consensus « Conserver », objectif moyen autour de 115 $ (MarketBeat, 16/10)."
+    ],
+    dt: [
+      "Jeudi 5 novembre, après clôture : résultats du T3 (conférence à 16 h 30 heure de New York). L’entreprise a indiqué qu’elle réexaminera sa prévision 2026 à cette occasion.",
+      "À surveiller aussi : marges, volumes de transplantations, avancement des essais, sentiment sur les valeurs de croissance et le secteur des dispositifs médicaux."
+    ],
+    src: [["Site investisseurs", "https://investors.transmedics.com/"], ["Résultats T2 (SEC)", "https://www.sec.gov/Archives/edgar/data/0001756262/000119312526332767/tmdx-ex99_1.htm"], ["Motley Fool, 05/08", "https://www.fool.com/investing/2026/08/05/why-transmedics-stock-is-sinking-today/"], ["MarketBeat, 16/10", "https://www.marketbeat.com/instant-alerts/price-transmedics-group-nasdaq-tmdx-shares-down-57-heres-what-happened-2026-10-16/"]]
+  },
+  TTWO: {
+    sym: "NASDAQ:TTWO", name: "Take-Two Interactive (TTWO) – GTA VI",
+    sub: "Éditeur de Grand Theft Auto (Rockstar Games), NBA 2K, Zynga. Le jeu GTA n’est pas coté : l’action de référence est TTWO.",
+    pos: [
+      "GTA VI sort le 19 novembre 2026 sur PS5 et Xbox Series X|S, à 79,99 $. Les précommandes ont ouvert le 25 juin.",
+      "Take-Two a réaffirmé la date en publiant ses résultats du T1 (07/08) et annonce un exercice 2027 record en réservations nettes.",
+      "Rockstar a diffusé « An Extended Look » sur Netflix le 27 août pour relancer l’attente."
+    ],
+    neg: [
+      "Le marché anticipe déjà un très gros lancement (consensus d’environ 37 M d’unités sur la période de lancement, selon Investing.com en août) : une déception serait sanctionnée.",
+      "Risques : prix élevé, coûts marketing, et tout report de la sortie (aucun signal actuel, la date est réaffirmée).",
+      "Rumeur non confirmée : une version PC au T1 2027."
+    ],
+    dt: [
+      "Lundi 9 novembre, après clôture : résultats du T2 de l’exercice 2027 (conférence à 16 h 30 heure de New York), dix jours avant la sortie. Le trimestre se termine le 30/09 : aucune vente de GTA VI n’y figure.",
+      "Jeudi 19 novembre : sortie de GTA VI. Les premiers chiffres de ventes arriveront avec les résultats du trimestre suivant.",
+      "À surveiller : nouvelles bandes-annonces, précommandes, éventuelle annonce PC, retours des premières critiques."
+    ],
+    src: [["Précommandes (BusinessWire)", "https://www.businesswire.com/news/home/20260624539426/en/Rockstar-Games-Announces-Pre-Orders-for-Grand-Theft-Auto-VI"], ["Résultats T1 FY27 (SEC)", "https://www.sec.gov/Archives/edgar/data/0000946581/000162828026054580/ttwo1q27earningsrelease.htm"], ["Date T2 FY27", "https://egw.news/gaming/news/37811/take-two-will-hold-another-quarter-fiscal-year-202-rYm8MkaiL"], ["Vice, 07/08", "https://www.vice.com/en/article/take-two-reaffirms-gta-6-release-date-netflix/"]]
+  }
+};
+// ───────── COMPTES À REBOURS (21:00 UTC = 16:00 New York, après clôture) ─────────
+const EVENTS = [
+  { l: "TransMedics · résultats T3", ts: Date.UTC(2026, 10, 5, 21, 0), n: "après clôture" },
+  { l: "Take-Two · résultats T2 FY27", ts: Date.UTC(2026, 10, 9, 21, 0), n: "après clôture" },
+  { l: "GTA VI · sortie", ts: Date.UTC(2026, 10, 19, 0, 0), n: "19 novembre 2026" }
+];
+const TFS = [["1", "1 min"], ["5", "5 min"], ["15", "15 min"], ["60", "1 h"], ["240", "4 h"], ["D", "1 jour"], ["W", "1 sem."], ["M", "1 mois"]];
+
+const $ = s => document.querySelector(s);
+const isDark = () => document.documentElement.dataset.theme === "dark" || (document.documentElement.dataset.theme !== "light" && matchMedia("(prefers-color-scheme: dark)").matches);
+function mount(box, src, cfg) {
+  box.innerHTML = "";
+  const c = document.createElement("div"); c.className = "tradingview-widget-container"; c.style.cssText = "height:100%;width:100%";
+  const w = document.createElement("div"); w.className = "tradingview-widget-container__widget"; w.style.cssText = "height:100%;width:100%";
+  const s = document.createElement("script"); s.src = src; s.async = true; s.innerHTML = JSON.stringify(cfg);
+  c.append(w, s); box.appendChild(c);
+}
+function chart(box, sym, interval) {
+  mount(box, "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js", {
+    autosize: true, symbol: sym, interval, timezone: "Europe/Brussels", theme: isDark() ? "dark" : "light", style: "1", locale: "fr",
+    allow_symbol_change: false, hide_side_toolbar: false, withdateranges: true, save_image: true, support_host: "https://www.tradingview.com"
+  });
+}
+function news(box, sym) {
+  mount(box, "https://s3.tradingview.com/external-embedding/embed-widget-timeline.js", {
+    feedMode: "symbol", symbol: sym, colorTheme: isDark() ? "dark" : "light", isTransparent: true, displayMode: "regular", width: "100%", height: "100%", locale: "fr"
+  });
+}
+function list(cls, title, items) {
+  const d = document.createElement("div"); d.className = cls;
+  const h = document.createElement("h3"); h.textContent = title; d.appendChild(h);
+  const u = document.createElement("ul"); items.forEach(t => { const li = document.createElement("li"); li.textContent = t; u.appendChild(li); }); d.appendChild(u);
+  return d;
+}
+function build(k) {
+  const a = REPORT[k], sec = document.createElement("section"); sec.className = "asset"; sec.dataset.k = k;
+  const h = document.createElement("h2"); h.textContent = a.name;
+  const sub = document.createElement("div"); sub.className = "sub"; sub.textContent = a.sub;
+  const tf = document.createElement("div"); tf.className = "tf";
+  const cb = document.createElement("div"); cb.className = "chart";
+  TFS.forEach(([v, lab]) => {
+    const b = document.createElement("button"); b.textContent = lab; if (v === "D") b.classList.add("on");
+    b.addEventListener("click", () => { tf.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)); chart(cb, a.sym, v); });
+    tf.appendChild(b);
+  });
+  const nb = document.createElement("div"); nb.className = "news";
+  const src = document.createElement("div"); src.className = "src"; src.append("Sources : ");
+  a.src.forEach(([t, u], i) => { const l = document.createElement("a"); l.href = u; l.target = "_blank"; l.rel = "noopener"; l.textContent = t; if (i) src.append(" · "); src.appendChild(l); });
+  const hn = document.createElement("h3"); hn.textContent = "Actualités en direct";
+  sec.append(h, sub, tf, cb, list("pos", "✅ Points positifs", a.pos), list("neg", "⚠️ Points négatifs et risques", a.neg), list("dt", "📅 Dates et éléments à surveiller", a.dt), src, hn, nb);
+  $("#cols").appendChild(sec);
+  chart(cb, a.sym, "D"); news(nb, a.sym);
+}
+$("#date").textContent = "Résumé rédigé le " + REPORT.date + " · graphiques et actualités en direct";
+["TMDX", "TTWO"].forEach(build);
+
+document.querySelectorAll("#view button").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll("#view button").forEach(x => x.classList.toggle("on", x === b));
+  const v = b.dataset.v; $("#cols").classList.toggle("one", v !== "all");
+  document.querySelectorAll(".asset").forEach(s => s.hidden = v !== "all" && s.dataset.k !== v);
+}));
+
+// compte à rebours
+const cds = $("#cds");
+EVENTS.forEach(e => { const d = document.createElement("div"); d.className = "cd"; d.innerHTML = "<small></small><b></b><span></span>"; d.children[0].textContent = e.l; cds.appendChild(d); e.el = d; });
+function tick() {
+  const now = Date.now();
+  EVENTS.forEach(e => {
+    const ms = e.ts - now, d = Math.floor(ms / 864e5), h = Math.floor(ms % 864e5 / 36e5), m = Math.floor(ms % 36e5 / 6e4);
+    e.el.children[1].textContent = ms <= 0 ? "terminé" : (d ? d + " j " : "") + h + " h " + m + " min";
+    e.el.children[2].textContent = e.n === "après clôture" ? new Intl.DateTimeFormat("fr-FR", { timeZone: "Europe/Brussels", weekday: "long", day: "numeric", month: "long" }).format(e.ts) + " · après clôture (≈ 22 h à Bruxelles)" : e.n;
+  });
+}
+tick(); setInterval(tick, 30000);
+</script>
+</body>
+</html>
